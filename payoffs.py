@@ -128,7 +128,7 @@ class Stock(Asset):
         return "Stock"
 
 
-# In[128]:
+# In[164]:
 
 
 class Portfolio:
@@ -159,6 +159,7 @@ class Portfolio:
         intercept = 0
         for i in range(len(self.long)):
             delta += self.long[i].get_quantity()
+            intercept -= self.long[i].find_price(self.data) * self.long[i].get_quantity()
         for i in range(len(self.short)):
             delta -= self.short[i].get_quantity()
             intercept += self.short[i].find_price(self.data) * self.short[i].get_quantity() 
@@ -209,13 +210,13 @@ class Portfolio:
 
 
 
-# In[158]:
+# In[165]:
 
 
 root = Tk()
 
 
-# In[159]:
+# In[166]:
 
 
 #creating label
@@ -249,7 +250,7 @@ p2label.grid(row=3,column=2)
 p3label.grid(row=4, column=2)
 
 
-# In[160]:
+# In[167]:
 
 
 p1 = Portfolio()
@@ -261,7 +262,7 @@ def myClick1():
     p1.add_position(position)
 
 
-# In[161]:
+# In[168]:
 
 
 def myClick2():
@@ -282,7 +283,7 @@ def myClear():
     p1.data = ""
 
 
-# In[162]:
+# In[169]:
 
 
 myButton = Button(root, text="Add Option", command = myClick)
@@ -301,7 +302,7 @@ myButton3.grid(row = 6, column = 1)
 
 
 
-# In[163]:
+# In[170]:
 
 
 root.mainloop()
