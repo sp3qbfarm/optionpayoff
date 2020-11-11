@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[122]:
+# In[221]:
 
 
 import numpy as np
@@ -22,7 +22,7 @@ from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 
 
-# In[123]:
+# In[222]:
 
 
 def loaddata(symbol,date):
@@ -39,7 +39,7 @@ def loaddata(symbol,date):
     return html
 
 
-# In[124]:
+# In[223]:
 
 
 def callpayoff(price, strike, premium):
@@ -54,7 +54,7 @@ def putpayoff(price, strike, premium):
         return (strike-price)*100 - premium*100
 
 
-# In[125]:
+# In[224]:
 
 
 class Asset:
@@ -70,7 +70,7 @@ class Asset:
         return self.ls
 
 
-# In[126]:
+# In[225]:
 
 
 class Option(Asset):
@@ -111,7 +111,7 @@ class Option(Asset):
         return "Option"
 
 
-# In[127]:
+# In[226]:
 
 
 class Stock(Asset):
@@ -128,7 +128,7 @@ class Stock(Asset):
         return "Stock"
 
 
-# In[164]:
+# In[235]:
 
 
 class Portfolio:
@@ -173,7 +173,7 @@ class Portfolio:
             b = max([x.get_strike() for x in self.puts])
         else:
             b = 0
-        prices = list(range(round(1.5*max(a,b))))
+        prices = np.arange(0, round(1.5*max(a,b)), 0.10).tolist()
         payoffs = []
         for i in prices:
             temppayoff = 0
@@ -192,7 +192,7 @@ class Portfolio:
     def total_payoff(self):
         prices = self.option_payoff()[0]
         if len(prices) <1:
-            prices = list(range(100))
+            prices = np.arange(0, 100, 0.1).tolist()
         if len(self.option_payoff()[0]) > 0:
             optionpayoff = self.option_payoff()[1]
         else:
@@ -210,13 +210,13 @@ class Portfolio:
 
 
 
-# In[165]:
+# In[282]:
 
 
 root = Tk()
 
 
-# In[166]:
+# In[283]:
 
 
 #creating label
@@ -228,6 +228,7 @@ nlabel = Label(root,text="Long/Short")
 plabel= Label(root,text="Maturity")
 p2label= Label(root,text="Quantity")
 p3label= Label(root,text="Strike")
+p4label = Label(root,text="Portfolio:")
 s  = Entry(root)
 e  = Entry(root)
 n  = Entry(root)
@@ -248,21 +249,35 @@ nlabel.grid(row=4,column=0)
 plabel.grid(row=2,column=2)
 p2label.grid(row=3,column=2)
 p3label.grid(row=4, column=2)
+p4label.grid(row =6, column =3)
 
 
-# In[167]:
+# In[284]:
 
 
 p1 = Portfolio()
+ps = ""
 def myClick():
+    global ps
     position = Option(float(p3.get()),str(e.get()),str(s.get()),int(p2.get()),str(n.get()),str(p.get()))
     p1.add_position(position)
+    olabel = Label(root, text = "Option Added")
+    olabel.grid(row = 6, column= 2)
+    ps = ps + str(n.get())+" "+str(p2.get())+" "+str(e.get())+" "+str(s.get())+" "+str(p.get())+" "+str(p3.get())+"\n"
+    pslabel = Label(root,text = ps)
+    pslabel.grid(row =7, column = 3)
 def myClick1():
+    global ps
     position = Stock(str(s.get()),int(p2.get()),str(n.get()))
     p1.add_position(position)
+    olabel = Label(root, text = "Stock Added")
+    olabel.grid(row = 6, column = 2)
+    ps = ps + str(n.get())+" "+str(p2.get())+" "+str(s.get())+"\n"
+    pslabel = Label(root,text = ps)
+    pslabel.grid(row=7,column = 3)
 
 
-# In[168]:
+# In[285]:
 
 
 def myClick2():
@@ -271,19 +286,26 @@ def myClick2():
     f = Figure(figsize=(4,4), dpi=100)
     a = f.add_subplot(111)
     a.plot(p1.total_payoff()[0],p1.total_payoff()[1])
+    a.grid(True, which='both')
+    a.axhline(y=0, color='k')
+    a.axvline(x=0, color='k')
     
     canvas = FigureCanvasTkAgg(f, master=root)
     canvas.draw()
-    canvas.get_tk_widget().grid(row = 7, column = 1)
+    canvas.get_tk_widget().grid(row = 8, column = 1)
 def myClear():
+    global ps
     p1.calls = []
     p1.puts = []
     p1.long = []
     p1.short = []
     p1.data = ""
+    ps = ""
+    pslabel = Label(root,text = ps)
+    pslabel.grid(row=7,column = 3)
 
 
-# In[169]:
+# In[286]:
 
 
 myButton = Button(root, text="Add Option", command = myClick)
@@ -302,8 +324,44 @@ myButton3.grid(row = 6, column = 1)
 
 
 
-# In[170]:
+# In[287]:
 
 
 root.mainloop()
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
