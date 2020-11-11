@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[221]:
+# In[288]:
 
 
 import numpy as np
@@ -22,7 +22,7 @@ from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 
 
-# In[222]:
+# In[289]:
 
 
 def loaddata(symbol,date):
@@ -39,7 +39,7 @@ def loaddata(symbol,date):
     return html
 
 
-# In[223]:
+# In[290]:
 
 
 def callpayoff(price, strike, premium):
@@ -54,7 +54,7 @@ def putpayoff(price, strike, premium):
         return (strike-price)*100 - premium*100
 
 
-# In[224]:
+# In[291]:
 
 
 class Asset:
@@ -70,7 +70,7 @@ class Asset:
         return self.ls
 
 
-# In[225]:
+# In[292]:
 
 
 class Option(Asset):
@@ -111,7 +111,7 @@ class Option(Asset):
         return "Option"
 
 
-# In[226]:
+# In[293]:
 
 
 class Stock(Asset):
@@ -128,7 +128,7 @@ class Stock(Asset):
         return "Stock"
 
 
-# In[235]:
+# In[301]:
 
 
 class Portfolio:
@@ -210,13 +210,13 @@ class Portfolio:
 
 
 
-# In[282]:
+# In[360]:
 
 
 root = Tk()
 
 
-# In[283]:
+# In[361]:
 
 
 #creating label
@@ -252,13 +252,17 @@ p3label.grid(row=4, column=2)
 p4label.grid(row =6, column =3)
 
 
-# In[284]:
+# In[362]:
 
 
 p1 = Portfolio()
 ps = ""
+pslabel = Label(root,text="")
+pslabel.grid(row=7,column=3)
 def myClick():
     global ps
+    global pslabel
+    pslabel.grid_forget()
     position = Option(float(p3.get()),str(e.get()),str(s.get()),int(p2.get()),str(n.get()),str(p.get()))
     p1.add_position(position)
     olabel = Label(root, text = "Option Added")
@@ -268,6 +272,8 @@ def myClick():
     pslabel.grid(row =7, column = 3)
 def myClick1():
     global ps
+    global pslabel
+    pslabel.grid_forget()
     position = Stock(str(s.get()),int(p2.get()),str(n.get()))
     p1.add_position(position)
     olabel = Label(root, text = "Stock Added")
@@ -277,7 +283,7 @@ def myClick1():
     pslabel.grid(row=7,column = 3)
 
 
-# In[285]:
+# In[363]:
 
 
 def myClick2():
@@ -295,17 +301,17 @@ def myClick2():
     canvas.get_tk_widget().grid(row = 8, column = 1)
 def myClear():
     global ps
+    global pslabel
     p1.calls = []
     p1.puts = []
     p1.long = []
     p1.short = []
     p1.data = ""
     ps = ""
-    pslabel = Label(root,text = ps)
-    pslabel.grid(row=7,column = 3)
+    pslabel.grid_forget()
 
 
-# In[286]:
+# In[364]:
 
 
 myButton = Button(root, text="Add Option", command = myClick)
@@ -324,7 +330,7 @@ myButton3.grid(row = 6, column = 1)
 
 
 
-# In[287]:
+# In[365]:
 
 
 root.mainloop()
