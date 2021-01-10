@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[288]:
+# In[1]:
 
 
 import numpy as np
@@ -22,7 +22,7 @@ from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 
 
-# In[289]:
+# In[2]:
 
 
 def loaddata(symbol,date):
@@ -39,7 +39,7 @@ def loaddata(symbol,date):
     return html
 
 
-# In[290]:
+# In[3]:
 
 
 def callpayoff(price, strike, premium):
@@ -54,7 +54,7 @@ def putpayoff(price, strike, premium):
         return (strike-price)*100 - premium*100
 
 
-# In[291]:
+# In[4]:
 
 
 class Asset:
@@ -70,7 +70,7 @@ class Asset:
         return self.ls
 
 
-# In[292]:
+# In[5]:
 
 
 class Option(Asset):
@@ -85,7 +85,7 @@ class Option(Asset):
         return self.cp
     def get_maturity(self):
         return self.maturity
-    def find_price(self,html):
+    def find_bidask(self,html):
         sdate = datetime.datetime.strptime("2020-11-13", '%Y-%m-%d')
         edate = datetime.datetime.strptime(self.maturity, '%Y-%m-%d')
         delta = edate-sdate
@@ -95,23 +95,38 @@ class Option(Asset):
             ender = ender + "0"
             i+=1
         ender = ender[::-1]
-        combined = self.underlying+str(edate.year)[-2:]+str(edate.month)+str(edate.day)+self.cp.upper()+ender
+        if len(str(edate.month))<2:
+            month = "0"+str(edate.month)
+        else:
+            month = str(edate.month)
+        if len(str(edate.day))<2:
+            day = "0"+str(edate.day)
+        else:
+            day = str(edate.day)
+        combined = self.underlying+str(edate.year)[-2:]+month+day+self.cp.upper()+ender
         left = html.find(combined)
-        right = html.find(combined)+500
-        b = "{:.2f}".format(self.strike)+ """</a></td><td class="data-col3 Ta(end) Pstart(7px)" data-reactid="""
+        right = html.find(combined)+800
+        #getting bid
+        b = """</td><td class="data-col4 Ta(end) Pstart(7px)" data-reactid="""
         left1 = html[left:right].find(b)+len(b) + left
         c = ">"
         left2 = html[left1:right].find(c) + len(c) + left1
         d = "<"
         right1 = html[left2:right].find(d)+left2
-
-        return float(html[left2:right1])
+        #getting ask
+        b = """</td><td class="data-col5 Ta(end) Pstart(7px)" data-reactid="""
+        left1a = html[left:right].find(b)+len(b) + left
+        c = ">"
+        left2a = html[left1a:right].find(c) + len(c) + left1a
+        d = "<"
+        right1a = html[left2a:right].find(d)+left2a
+        return float(html[left2:right1]), float(html[left2a:right1a])
         
     def get_type(self):
         return "Option"
 
 
-# In[293]:
+# In[6]:
 
 
 class Stock(Asset):
@@ -128,7 +143,7 @@ class Stock(Asset):
         return "Stock"
 
 
-# In[301]:
+# In[7]:
 
 
 class Portfolio:
@@ -179,14 +194,14 @@ class Portfolio:
             temppayoff = 0
             for j in range(len(self.calls)):
                 if self.calls[j].get_ls() == "s":
-                    temppayoff -= callpayoff(i,self.calls[j].get_strike(),self.calls[j].find_price(self.data))*self.calls[j].get_quantity() 
+                    temppayoff -= callpayoff(i,self.calls[j].get_strike(),self.calls[j].find_bidask(self.data)[0])*self.calls[j].get_quantity() 
                 else:
-                    temppayoff += callpayoff(i,self.calls[j].get_strike(),self.calls[j].find_price(self.data))*self.calls[j].get_quantity()
+                    temppayoff += callpayoff(i,self.calls[j].get_strike(),self.calls[j].find_bidask(self.data)[1])*self.calls[j].get_quantity()
             for k in range(len(self.puts)):
                 if self.puts[k].get_ls() == "s":
-                    temppayoff -= putpayoff(i,self.puts[k].get_strike(),self.puts[k].find_price(self.data))*self.puts[k].get_quantity()
+                    temppayoff -= putpayoff(i,self.puts[k].get_strike(),self.puts[k].find_bidask(self.data)[0])*self.puts[k].get_quantity()
                 else:
-                    temppayoff += putpayoff(i,self.puts[k].get_strike(),self.puts[k].find_price(self.data))*self.puts[k].get_quantity()
+                    temppayoff += putpayoff(i,self.puts[k].get_strike(),self.puts[k].find_bidask(self.data)[1])*self.puts[k].get_quantity()
             payoffs.append(temppayoff)
         return prices, payoffs
     def total_payoff(self):
@@ -210,13 +225,13 @@ class Portfolio:
 
 
 
-# In[360]:
+# In[8]:
 
 
 root = Tk()
 
 
-# In[361]:
+# In[9]:
 
 
 #creating label
@@ -252,7 +267,7 @@ p3label.grid(row=4, column=2)
 p4label.grid(row =6, column =3)
 
 
-# In[362]:
+# In[10]:
 
 
 p1 = Portfolio()
@@ -283,7 +298,7 @@ def myClick1():
     pslabel.grid(row=7,column = 3)
 
 
-# In[363]:
+# In[11]:
 
 
 def myClick2():
@@ -311,7 +326,7 @@ def myClear():
     pslabel.grid_forget()
 
 
-# In[364]:
+# In[12]:
 
 
 myButton = Button(root, text="Add Option", command = myClick)
@@ -330,37 +345,25 @@ myButton3.grid(row = 6, column = 1)
 
 
 
-# In[365]:
+# In[13]:
 
 
 root.mainloop()
 
 
-# In[ ]:
+# In[15]:
 
 
 
 
 
-# In[ ]:
+# In[18]:
 
 
 
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
+# In[19]:
 
 
 
